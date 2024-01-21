@@ -40,10 +40,14 @@ class Project
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Activity::class, orphanRemoval: true)]
     private Collection $activities;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'member_of')]
+    private Collection $members;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->activities = new ArrayCollection();
+        $this->members = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -161,6 +165,30 @@ class Project
                 $activity->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(User $member): static
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+        }
+
+        return $this;
+    }
+
+    public function removeMember(User $member): static
+    {
+        $this->members->removeElement($member);
 
         return $this;
     }

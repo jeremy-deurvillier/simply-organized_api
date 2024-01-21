@@ -49,11 +49,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Project::class, orphanRemoval: true)]
     private Collection $projects;
 
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'members')]
+    private Collection $member_of;
+
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'guests')]
+    private Collection $event_invitations;
+
     public function __construct()
     {
         $this->quicknotes = new ArrayCollection();
         $this->events = new ArrayCollection();
         $this->projects = new ArrayCollection();
+        $this->member_of = new ArrayCollection();
+        $this->event_invitations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -247,6 +255,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($project->getUser() === $this) {
                 $project->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getMemberOf(): Collection
+    {
+        return $this->member_of;
+    }
+
+    public function addMemberOf(Project $memberOf): static
+    {
+        if (!$this->member_of->contains($memberOf)) {
+            $this->member_of->add($memberOf);
+            $memberOf->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMemberOf(Project $memberOf): static
+    {
+        if ($this->member_of->removeElement($memberOf)) {
+            $memberOf->removeMember($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getEventInvitations(): Collection
+    {
+        return $this->event_invitations;
+    }
+
+    public function addEventInvitation(Event $eventInvitation): static
+    {
+        if (!$this->event_invitations->contains($eventInvitation)) {
+            $this->event_invitations->add($eventInvitation);
+            $eventInvitation->addGuest($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEventInvitation(Event $eventInvitation): static
+    {
+        if ($this->event_invitations->removeElement($eventInvitation)) {
+            $eventInvitation->removeGuest($this);
         }
 
         return $this;

@@ -55,9 +55,13 @@ class Event
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'event_invitations')]
+    private Collection $guests;
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
+        $this->guests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +221,30 @@ class Event
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getGuests(): Collection
+    {
+        return $this->guests;
+    }
+
+    public function addGuest(User $guest): static
+    {
+        if (!$this->guests->contains($guest)) {
+            $this->guests->add($guest);
+        }
+
+        return $this;
+    }
+
+    public function removeGuest(User $guest): static
+    {
+        $this->guests->removeElement($guest);
 
         return $this;
     }
