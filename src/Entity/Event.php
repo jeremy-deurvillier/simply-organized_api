@@ -1,0 +1,223 @@
+<?php
+
+namespace App\Entity;
+
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\EventRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ApiResource]
+class Event
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 180)]
+    private ?string $name = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $note = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $date_start = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $date_end = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $recurrence_rule = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $alarm_rule = null;
+
+    #[ORM\Column(length: 200, nullable: true)]
+    private ?string $location = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $shared_url = null;
+
+    #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'events')]
+    private Collection $resources;
+
+    #[ORM\ManyToOne(inversedBy: 'events')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    public function __construct()
+    {
+        $this->resources = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): static
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    public function getDateStart(): ?\DateTimeImmutable
+    {
+        return $this->date_start;
+    }
+
+    public function setDateStart(\DateTimeImmutable $date_start): static
+    {
+        $this->date_start = $date_start;
+
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeImmutable
+    {
+        return $this->date_end;
+    }
+
+    public function setDateEnd(\DateTimeImmutable $date_end): static
+    {
+        $this->date_end = $date_end;
+
+        return $this;
+    }
+
+    public function getRecurrenceRule(): ?string
+    {
+        return $this->recurrence_rule;
+    }
+
+    public function setRecurrenceRule(?string $recurrence_rule): static
+    {
+        $this->recurrence_rule = $recurrence_rule;
+
+        return $this;
+    }
+
+    public function getAlarmRule(): ?string
+    {
+        return $this->alarm_rule;
+    }
+
+    public function setAlarmRule(?string $alarm_rule): static
+    {
+        $this->alarm_rule = $alarm_rule;
+
+        return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?string $location): static
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getSharedUrl(): ?string
+    {
+        return $this->shared_url;
+    }
+
+    public function setSharedUrl(?string $shared_url): static
+    {
+        $this->shared_url = $shared_url;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getResources(): Collection
+    {
+        return $this->resources;
+    }
+
+    public function addResource(Resource $resource): static
+    {
+        if (!$this->resources->contains($resource)) {
+            $this->resources->add($resource);
+        }
+
+        return $this;
+    }
+
+    public function removeResource(Resource $resource): static
+    {
+        $this->resources->removeElement($resource);
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+}
