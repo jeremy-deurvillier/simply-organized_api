@@ -26,7 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Groups(["create:user", "update:user", "read:user"])]
-    private ?string $email = null;
+    private ?string $alias = null;
 
     #[ORM\Column]
     #[Groups(["read:user"])]
@@ -39,9 +39,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(["create:user", "update:user", "read:user"])]
     private ?string $password = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true, nullable: true)]
     #[Groups(["create:user", "update:user", "read:user"])]
-    private ?string $alias = null;
+    private ?string $email = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -83,14 +83,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getAlias(): ?string
     {
-        return $this->email;
+        return $this->alias;
     }
 
-    public function setEmail(string $email): static
+    public function setAlias(string $alias): static
     {
-        $this->email = $email;
+        $this->alias = $alias;
 
         return $this;
     }
@@ -102,7 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->alias;
     }
 
     /**
@@ -148,14 +148,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getAlias(): ?string
+    public function getEmail(): ?string
     {
-        return $this->alias;
+        return $this->email;
     }
 
-    public function setAlias(string $alias): static
+    public function setEmail(?string $email): static
     {
-        $this->alias = $alias;
+        $this->email = $email;
 
         return $this;
     }
