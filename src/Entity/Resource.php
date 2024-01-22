@@ -7,20 +7,27 @@ use App\Repository\ResourceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:resource", "update:resource"]],
+    normalizationContext: ["groups" => ["read:resource"]]
+)]
 class Resource
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:resource"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["create:resource", "update:resource", "read:resource"])]
     private ?string $filename = null;
 
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'resources')]
+    #[Groups(["read:resource"])]
     private Collection $events;
 
     public function __construct()

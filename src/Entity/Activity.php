@@ -8,32 +8,43 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:activity", "update:activity"]],
+    normalizationContext: ["groups" => ["read:activity"]]
+)]
 class Activity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:activity"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?\DateTimeImmutable $datetime = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?int $duration = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?string $recurrence_rule = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private ?string $alarm_rule = null;
 
     #[ORM\Column]
@@ -44,18 +55,22 @@ class Activity
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["read:activity"])]
     private ?Project $project = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities')]
+    #[Groups(["create:activity", "update:activity", "read:activity"])]
     private Collection $categories;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $date_last_state = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[Groups(["update:activity", "read:activity"])]
     private ?EisenhowerMatrix $eisenhower_matrix = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[Groups(["update:activity", "read:activity"])]
     private ?State $state = null;
 
     public function __construct()

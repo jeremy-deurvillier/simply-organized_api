@@ -8,20 +8,27 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:project", "update:project"]],
+    normalizationContext: ["groups" => ["read:project"]]
+)]
 class Project
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:project"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(["create:project", "update:project", "read:project"])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:project", "update:project", "read:project"])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -35,12 +42,15 @@ class Project
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'projects')]
+    #[Groups(["create:project", "read:project"])]
     private Collection $categories;
 
     #[ORM\OneToMany(mappedBy: 'project', targetEntity: Activity::class, orphanRemoval: true)]
+    #[Groups(["read:project"])]
     private Collection $activities;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'member_of')]
+    #[Groups(["read:project"])]
     private Collection $members;
 
     public function __construct()

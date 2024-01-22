@@ -9,29 +9,38 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ApiResource()]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:user", "update:user"]],
+    normalizationContext: ["groups" => ["read:user"]]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:user"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(["create:user", "update:user", "read:user"])]
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Groups(["read:user"])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(["create:user", "update:user", "read:user"])]
     private ?string $password = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(["create:user", "update:user", "read:user"])]
     private ?string $alias = null;
 
     #[ORM\Column]
@@ -41,18 +50,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Quicknote::class, orphanRemoval: true)]
+    #[Groups(["read:user"])]
     private Collection $quicknotes;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Event::class, orphanRemoval: true)]
+    #[Groups(["read:user"])]
     private Collection $events;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Project::class, orphanRemoval: true)]
+    #[Groups(["read:user"])]
     private Collection $projects;
 
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'members')]
+    #[Groups(["read:user"])]
     private Collection $member_of;
 
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'guests')]
+    #[Groups(["read:user"])]
     private Collection $event_invitations;
 
     public function __construct()

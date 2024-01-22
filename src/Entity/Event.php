@@ -8,35 +8,47 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:event", "update:event"]],
+    normalizationContext: ["groups" => ["read:event"]]
+)]
 class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:event"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?string $note = null;
 
     #[ORM\Column]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?\DateTimeImmutable $date_start = null;
 
     #[ORM\Column]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?\DateTimeImmutable $date_end = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?string $recurrence_rule = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?string $alarm_rule = null;
 
     #[ORM\Column(length: 200, nullable: true)]
+    #[Groups(["create:event", "update:event", "read:event"])]
     private ?string $location = null;
 
     #[ORM\Column]
@@ -46,9 +58,11 @@ class Event
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["read:event"])]
     private ?string $shared_url = null;
 
     #[ORM\ManyToMany(targetEntity: Resource::class, inversedBy: 'events')]
+    #[Groups(["read:event"])]
     private Collection $resources;
 
     #[ORM\ManyToOne(inversedBy: 'events')]
@@ -56,6 +70,7 @@ class Event
     private ?User $user = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'event_invitations')]
+    #[Groups(["read:event"])]
     private Collection $guests;
 
     public function __construct()

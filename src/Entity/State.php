@@ -7,26 +7,35 @@ use App\Repository\StateRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: StateRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:state", "update:state"]],
+    normalizationContext: ["groups" => ["read:state"]]
+)]
 class State
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:state"])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["create:state", "update:state", "read:state"])]
     private ?bool $progress = null;
 
     #[ORM\Column]
+    #[Groups(["create:state", "update:state", "read:state"])]
     private ?bool $done = null;
 
     #[ORM\Column]
+    #[Groups(["create:state", "update:state", "read:state"])]
     private ?bool $canceled = null;
 
     #[ORM\OneToMany(mappedBy: 'state', targetEntity: Activity::class)]
+    #[Groups(["read:state"])]
     private Collection $activities;
 
     public function __construct()

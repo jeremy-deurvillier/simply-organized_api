@@ -7,17 +7,23 @@ use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:category", "update:category"]],
+    normalizationContext: ["groups" => ["read:category"]]
+)]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:category"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 40)]
+    #[Groups(["create:category", "update:category", "read:category"])]
     private ?string $label = null;
 
     #[ORM\Column]
@@ -27,9 +33,11 @@ class Category
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'categories')]
+    #[Groups(["read:category"])]
     private Collection $projects;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'categories')]
+    #[Groups(["read:category"])]
     private Collection $activities;
 
     public function __construct()

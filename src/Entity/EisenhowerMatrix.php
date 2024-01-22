@@ -7,23 +7,31 @@ use App\Repository\EisenhowerMatrixRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EisenhowerMatrixRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:eisenhower", "update:eisenhower"]],
+    normalizationContext: ["groups" => ["read:eisenhower"]]
+)]
 class EisenhowerMatrix
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:eisenhower"])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["create:eisenhower", "update:eisenhower", "read:eisenhower"])]
     private ?bool $hight = null;
 
     #[ORM\Column]
+    #[Groups(["create:eisenhower", "update:eisenhower", "read:eisenhower"])]
     private ?bool $imperative = null;
 
     #[ORM\OneToMany(mappedBy: 'eisenhower_matrix', targetEntity: Activity::class)]
+    #[Groups(["read:eisenhower"])]
     private Collection $activities;
 
     public function __construct()

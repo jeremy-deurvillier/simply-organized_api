@@ -5,17 +5,23 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\QuicknoteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuicknoteRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    denormalizationContext: ["groups" => ["create:quicknote", "update:quicknote"]],
+    normalizationContext: ["groups" => ["read:quicknote"]]
+)]
 class Quicknote
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read:quicknote"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["create:quicknote", "update:quicknote", "read:quicknote"])]
     private ?string $content = null;
 
     #[ORM\Column]
