@@ -1,7 +1,7 @@
 api_platform:
     show_webby: false
     title: Simply Organized API
-    version: 1.0.0
+    version: 16.12.89
     formats:
         jsonld: ['application/ld+json']
     docs_formats:

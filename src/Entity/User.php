@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
+use App\State\UserProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,8 +17,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
     denormalizationContext: ["groups" => ["create:user", "update:user"]],
-    normalizationContext: ["groups" => ["read:user"]]
+    normalizationContext: ["groups" => ["read:user"]],
 )]
+#[Post(processor: UserProcessor::class)]
+#[GetCollection()]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -25,8 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(["create:user", "update:user", "read:user"])]
-    private ?string $alias = null;
+    #[Groups(["read:user"])]
+    private ?string $uuid = null;
 
     #[ORM\Column]
     #[Groups(["read:user"])]
@@ -38,6 +43,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     #[Groups(["create:user", "update:user", "read:user"])]
     private ?string $password = null;
+
+    #[ORM\Column(length: 180)]
+    #[Groups(["create:user", "update:user", "read:user"])]
+    private ?string $alias = null;
 
     #[ORM\Column(length: 180, unique: true, nullable: true)]
     #[Groups(["create:user", "update:user", "read:user"])]
@@ -83,14 +92,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getAlias(): ?string
+    public function getUuid(): ?string
     {
-        return $this->alias;
+        return $this->uuid;
     }
 
-    public function setAlias(string $alias): static
+    public function setUuid(string $uuid): static
     {
-        $this->alias = $alias;
+        $this->uuid = $uuid;
 
         return $this;
     }
@@ -102,7 +111,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->alias;
+        return (string) $this->uuid;
     }
 
     /**
@@ -146,6 +155,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getAlias(): ?string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(string $alias): static
+    {
+        $this->alias = $alias;
+
+        return $this;
     }
 
     public function getEmail(): ?string
