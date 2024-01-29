@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
@@ -20,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ["groups" => ["read:user"]],
 )]
 #[Post(processor: UserProcessor::class)]
+#[Get()]
 #[GetCollection()]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
