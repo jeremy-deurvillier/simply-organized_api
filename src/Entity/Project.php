@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:project", "update:project"]],
     normalizationContext: ["groups" => ["read:project"]]
 )]

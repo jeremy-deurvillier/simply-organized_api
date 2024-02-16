@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:activity", "update:activity"]],
     normalizationContext: ["groups" => ["read:activity"]]
 )]

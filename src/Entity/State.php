@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: StateRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:state", "update:state"]],
     normalizationContext: ["groups" => ["read:state"]]
 )]

@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: QuicknoteRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:quicknote", "update:quicknote"]],
     normalizationContext: ["groups" => ["read:quicknote"]]
 )]

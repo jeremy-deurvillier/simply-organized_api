@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:event", "update:event"]],
     normalizationContext: ["groups" => ["read:event"]]
 )]

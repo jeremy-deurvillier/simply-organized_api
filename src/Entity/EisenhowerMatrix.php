@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: EisenhowerMatrixRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_USER')",
     denormalizationContext: ["groups" => ["create:eisenhower", "update:eisenhower"]],
     normalizationContext: ["groups" => ["read:eisenhower"]]
 )]
