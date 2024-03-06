@@ -16,8 +16,7 @@ class UserProcessor implements ProcessorInterface
         private ProcessorInterface $persistProcessor,
         private ProcessorInterface $removeProcessor,
         private UserPasswordHasherInterface $passwordHasher
-    )
-    {
+    ) {
     }
 
     public function process(mixed $user, Operation $operation, array $uriVariables = [], array $context = []): mixed

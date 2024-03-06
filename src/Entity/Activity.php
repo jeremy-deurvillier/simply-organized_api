@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ActivityRepository;
+use App\State\ActivityProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -14,39 +17,42 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
     security: "is_granted('ROLE_USER')",
-    denormalizationContext: ["groups" => ["create:activity", "update:activity"]],
+    denormalizationContext: ["groups" => ["create:activity", "update:activity"], "jsonld_embed_context" => true],
     normalizationContext: ["groups" => ["read:activity"]]
 )]
+// #[Post(processor: ActivityProcessor::class)]
+#[Get()]
+#[GetCollection()]
 class Activity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["read:activity"])]
+    #[Groups(["read:project", "read:activity"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "create:activity", "update:activity", "read:activity"])]
     private ?\DateTimeImmutable $datetime = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private ?int $duration = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private ?string $recurrence_rule = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private ?string $alarm_rule = null;
 
     #[ORM\Column]
@@ -55,16 +61,17 @@ class Activity
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["read:activity"])]
+    #[Groups(["create:project", "update:project", "read:activity"])]
     private ?Project $project = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities')]
-    #[Groups(["create:activity", "update:activity", "read:activity"])]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities', cascade: ['persist'])]
+    #[Groups(["create:project", "update:project", "read:project", "create:activity", "update:activity", "read:activity"])]
     private Collection $categories;
 
     #[ORM\Column(nullable: true)]
+    #[Groups("read:project")]
     private ?\DateTimeImmutable $date_last_state = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]

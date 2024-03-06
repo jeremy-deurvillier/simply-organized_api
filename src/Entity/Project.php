@@ -2,8 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ProjectRepository;
+use App\State\ProjectProcessor;
+use App\State\ProjectProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -13,9 +20,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 #[ApiResource(
     security: "is_granted('ROLE_USER')",
-    denormalizationContext: ["groups" => ["create:project", "update:project"]],
+    denormalizationContext: ["groups" => ["create:project", "update:project"], "jsonld_embed_context" => true, "enable_max_depth" => true],
     normalizationContext: ["groups" => ["read:project"]]
 )]
+#[Post(processor: ProjectProcessor::class)]
+#[Patch(processor: ProjectProcessor::class)]
+#[Get(provider: ProjectProvider::class)]
+#[GetCollection(provider: ProjectProvider::class)]
 class Project
 {
     #[ORM\Id]
@@ -42,17 +53,23 @@ class Project
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'projects')]
-    #[Groups(["create:project", "read:project"])]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'projects', cascade: ['persist'])]
+    #[Groups(["create:project", "update:project", "read:project"])]
+    #[ApiProperty(readableLink: true, writableLink: true, fetchEager: true)]
     private Collection $categories;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Activity::class, orphanRemoval: true)]
-    #[Groups(["read:project"])]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Activity::class, orphanRemoval: true, cascade: ['persist'])]
+    #[Groups(["create:project", "update:project", "read:project"])]
+    #[ApiProperty(readableLink: true, writableLink: true, fetchEager: true)]
     private Collection $activities;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'member_of')]
     #[Groups(["read:project"])]
     private Collection $members;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(["create:project", "update:project", "read:project"])]
+    private ?string $list = null;
 
     public function __construct()
     {
@@ -200,6 +217,18 @@ class Project
     public function removeMember(User $member): static
     {
         $this->members->removeElement($member);
+
+        return $this;
+    }
+
+    public function getList(): ?string
+    {
+        return $this->list;
+    }
+
+    public function setList(?string $list): static
+    {
+        $this->list = $list;
 
         return $this;
     }

@@ -21,6 +21,18 @@ class ActivityRepository extends ServiceEntityRepository
         parent::__construct($registry, Activity::class);
     }
 
+    public function getActivityByIdAndProject(int $id, int $projectId)
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.id = :id')
+            ->andWhere('a.user = :projectId')
+            ->setParameter('id', $id)
+            ->setParameter('projectId', $projectId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Activity[] Returns an array of Activity objects
 //     */

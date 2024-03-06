@@ -3,7 +3,11 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\CategoryRepository;
+use App\State\CategoryProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,16 +19,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ["groups" => ["create:category", "update:category"]],
     normalizationContext: ["groups" => ["read:category"]]
 )]
+// #[Post(processor: CategoryProcessor::class)]
+#[Get()]
+#[GetCollection()]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["read:category"])]
+    #[Groups(["read:project", "read:category"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 40)]
-    #[Groups(["create:category", "update:category", "read:category"])]
+    #[Groups(["create:project", "update:project", "read:project", "create:category", "update:category", "read:category"])]
     private ?string $label = null;
 
     #[ORM\Column]
@@ -34,11 +41,11 @@ class Category
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'categories')]
-    #[Groups(["read:category"])]
+    // #[Groups(["create:project", "read:project", "read:category"])]
     private Collection $projects;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'categories')]
-    #[Groups(["read:category"])]
+    // #[Groups(["create:activity", "update:activity", "read:category"])]
     private Collection $activities;
 
     public function __construct()

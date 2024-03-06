@@ -27,3 +27,18 @@ services:
             $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
             $removeProcessor: '@api_platform.doctrine.orm.state.remove_processor'
         tags: ['api_platform.state_processor']
+    App\State\ProjectProcessor:
+        arguments:
+            $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+            # $removeProcessor: '@api_platform.doctrine.orm.state.remove_processor'
+        tags: ['api_platform.state_processor']
+    # App\State\CategoryProcessor:
+    #     arguments:
+    #         $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+    #         # $removeProcessor: '@api_platform.doctrine.orm.state.remove_processor'
+    #     tags: ['api_platform.state_processor']
+    # App\State\ActivityProcessor:
+    #     arguments:
+    #         $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+    #         # $removeProcessor: '@api_platform.doctrine.orm.state.remove_processor'
+    #     tags: ['api_platform.state_processor']
